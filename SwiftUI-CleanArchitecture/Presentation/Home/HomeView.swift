@@ -54,7 +54,7 @@ struct HomeView: View {
                             
                             LazyVGrid(columns: gridColumns, spacing: 20) {
                                 ForEach(viewModel.allGames) { game in
-                                    NavigationLink(destination: DIContainer().makeDetailView(for: game.id)) {
+                                    NavigationLink(destination: diContainer.makeDetailView(for: game.id)) {
                                         GameCardView(game: game)
                                     }
                                 }

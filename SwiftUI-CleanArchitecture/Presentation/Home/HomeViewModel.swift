@@ -44,7 +44,6 @@ class HomeViewModel: ObservableObject {
         errorMessage = nil
         
         getGamesUseCase.execute(query: query)
-            // Receive the results on the main thread to safely update the UI
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.isLoading = false
@@ -54,6 +53,6 @@ class HomeViewModel: ObservableObject {
             }, receiveValue: { [weak self] returnedGames in
                 self?.games = returnedGames
             })
-            .store(in: &cancellables) // Store the subscription
+            .store(in: &cancellables) 
     }
 }

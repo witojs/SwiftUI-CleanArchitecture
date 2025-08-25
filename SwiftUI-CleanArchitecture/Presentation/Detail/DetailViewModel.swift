@@ -46,8 +46,6 @@ class DetailViewModel: ObservableObject {
     func loadGameDetails() {
         isLoading = true
         
-        // Use `Publishers.Zip` to combine two network calls into one.
-        // It waits for both to complete before emitting a value.
         let detailPublisher = getGameDetailUseCase.execute(id: gameId)
         let screenshotsPublisher = getScreenshotsUseCase.execute(gameId: gameId)
         
@@ -83,11 +81,10 @@ class DetailViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] _ in
                 guard let self = self else { return }
-                let newStatus = !self.isFavorite
                 
-                // ✅ Instead of just changing its own state,
-                // it now broadcasts the change to the entire app.
-                self.favoriteStatusService.post(gameId: self.gameId, isFavorite: newStatus)
+                self.isFavorite.toggle()
+                
+                self.favoriteStatusService.post(gameId: self.gameId, isFavorite: self.isFavorite)
             })
             .store(in: &cancellables)
     }
@@ -95,12 +92,10 @@ class DetailViewModel: ObservableObject {
     private func subscribeToFavoriteChanges() {
         favoriteStatusService.statusDidChange
             .receive(on: RunLoop.main)
-            // We only care about updates for the game this ViewModel is displaying.
             .filter { [weak self] change in
                 return change.gameId == self?.gameId
             }
             .sink { [weak self] change in
-                // When a relevant change is received, update the local state.
                 self?.isFavorite = change.isFavorite
             }
             .store(in: &cancellables)

@@ -56,7 +56,7 @@ class DIContainer: ObservableObject {
         DetailViewModel(
             gameId: gameId,
             getGameDetailUseCase: makeGetGameDetailUseCase(),
-            getScreenshotsUseCase: makeGetScreenshotsUseCase(), // Inject new dependency
+            getScreenshotsUseCase: makeGetScreenshotsUseCase(), 
             addFavoriteUseCase: makeAddFavoriteUseCase(),
             removeFavoriteUseCase: makeRemoveFavoriteUseCase(),
             checkFavoriteStatusUseCase: makeCheckFavoriteStatusUseCase(),
