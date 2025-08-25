@@ -4,6 +4,7 @@
 //
 //  Created by Wito Irawan on 24/08/25.
 //
+import Combine
 
 class GameRepositoryImpl: GameRepository {
     private let remoteDataSource: APIServiceProtocol
@@ -15,40 +16,41 @@ class GameRepositoryImpl: GameRepository {
     }
     
     // --- Remote ---
-    func getGames(query: String) async throws -> [GameEntity] {
-        let games = try await remoteDataSource.fetchGames(with: query)
-        
-        return games.map { $0.toEntity() }
+    func getGames(query: String) -> AnyPublisher<[GameEntity], Error> {
+        return remoteDataSource.fetchGames(with: query)
+            .map { $0.map { $0.toEntity() } } // Map the array of Games to GameEntities
+            .eraseToAnyPublisher()
     }
     
-    func getGameDetail(id: Int) async throws -> GameEntity {
-        let gameDetail = try await remoteDataSource.fetchGameDetail(id: id)
-
-        return gameDetail.toEntity()
+    func getGameDetail(id: Int) -> AnyPublisher<GameEntity, Error> {
+        return remoteDataSource.fetchGameDetail(id: id)
+            .map { $0.toEntity() } // Map the single Game to a GameEntity
+            .eraseToAnyPublisher()
     }
     
-    func getScreenshots(for gameId: Int) async throws -> [ScreenshotEntity] {
-        let screenshots = try await remoteDataSource.fetchScreenshots(for: gameId)
-        return screenshots.map { $0.toEntity() }
+    func getScreenshots(for gameId: Int) -> AnyPublisher<[ScreenshotEntity], Error> {
+        return remoteDataSource.fetchScreenshots(for: gameId)
+            .map { $0.map { $0.toEntity() } }
+            .eraseToAnyPublisher()
     }
     
     // --- Local ---
-    func addFavorite(_ game: GameEntity) throws {
-        try localDataSource.addFavorite(game.toFavoriteGame())
+    func addFavorite(_ game: GameEntity) -> AnyPublisher<Void, Error> {
+        return localDataSource.addFavorite(game.toFavoriteGame())
     }
     
-    func removeFavorite(id: Int) throws {
-        try localDataSource.removeFavorite(id: id)
+    func removeFavorite(id: Int) -> AnyPublisher<Void, Error> {
+        return localDataSource.removeFavorite(id: id)
     }
     
-    func isFavorite(id: Int) -> Bool {
+    func isFavorite(id: Int) -> AnyPublisher<Bool, Error> {
         return localDataSource.isFavorite(id: id)
     }
     
-    func getFavorites() throws -> [GameEntity] {
-        let favoriteGames = try localDataSource.getFavorites()
-        
-        return favoriteGames.map { $0.toEntity() }
+    func getFavorites() -> AnyPublisher<[GameEntity], Error> {
+        return localDataSource.getFavorites()
+            .map { $0.map { $0.toEntity() } }
+            .eraseToAnyPublisher()
     }
 }
 

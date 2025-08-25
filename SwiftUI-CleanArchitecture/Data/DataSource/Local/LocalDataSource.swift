@@ -7,12 +7,13 @@
 
 import Foundation
 import SwiftData
+import Combine
 
 protocol LocalDataSourceProtocol {
-    func addFavorite(_ game: FavoriteGame) throws
-    func removeFavorite(id: Int) throws
-    func isFavorite(id: Int) -> Bool
-    func getFavorites() throws -> [FavoriteGame]
+    func addFavorite(_ game: FavoriteGame) -> AnyPublisher<Void, Error>
+    func removeFavorite(id: Int) -> AnyPublisher<Void, Error>
+    func isFavorite(id: Int) -> AnyPublisher<Bool, Error>
+    func getFavorites() -> AnyPublisher<[FavoriteGame], Error>
 }
 
 class LocalDataSource: LocalDataSourceProtocol {
@@ -25,30 +26,55 @@ class LocalDataSource: LocalDataSourceProtocol {
         self.modelContext = modelContainer.mainContext
     }
 
-    func addFavorite(_ game: FavoriteGame) throws {
-        modelContext.insert(game)
-        try modelContext.save()
+    func addFavorite(_ game: FavoriteGame) -> AnyPublisher<Void, Error> {
+        return Future<Void, Error> { [weak self] promise in
+            do {
+                self?.modelContext.insert(game)
+                try self?.modelContext.save()
+                promise(.success(())) // Signal success
+            } catch {
+                promise(.failure(error)) // Signal failure
+            }
+        }.eraseToAnyPublisher()
     }
 
-    func removeFavorite(id: Int) throws {
-        let predicate = #Predicate<FavoriteGame> { $0.id == id }
-        try modelContext.delete(model: FavoriteGame.self, where: predicate)
+    func removeFavorite(id: Int) -> AnyPublisher<Void, Error> {
+        return Future<Void, Error> { [weak self] promise in
+            guard let self = self else { return }
+            do {
+                let predicate = #Predicate<FavoriteGame> { $0.id == id }
+                try self.modelContext.delete(model: FavoriteGame.self, where: predicate)
+                promise(.success(()))
+            } catch {
+                promise(.failure(error))
+            }
+        }.eraseToAnyPublisher()
     }
 
-    func isFavorite(id: Int) -> Bool {
-        let predicate = #Predicate<FavoriteGame> { $0.id == id }
-        var descriptor = FetchDescriptor(predicate: predicate)
-        descriptor.fetchLimit = 1
-        
-        do {
-            let count = try modelContext.fetchCount(descriptor)
-            return count > 0
-        } catch {
-            return false
-        }
+    func isFavorite(id: Int) -> AnyPublisher<Bool, Error> {
+        return Future<Bool, Error> { [weak self] promise in
+            guard let self = self else { return }
+            do {
+                let predicate = #Predicate<FavoriteGame> { $0.id == id }
+                var descriptor = FetchDescriptor(predicate: predicate)
+                descriptor.fetchLimit = 1
+                let count = try self.modelContext.fetchCount(descriptor)
+                promise(.success(count > 0))
+            } catch {
+                promise(.failure(error))
+            }
+        }.eraseToAnyPublisher()
     }
 
-    func getFavorites() throws -> [FavoriteGame] {
-        try modelContext.fetch(FetchDescriptor<FavoriteGame>())
+    func getFavorites() -> AnyPublisher<[FavoriteGame], Error> {
+        return Future<[FavoriteGame], Error> { [weak self] promise in
+            guard let self = self else { return }
+            do {
+                let favorites = try self.modelContext.fetch(FetchDescriptor<FavoriteGame>())
+                promise(.success(favorites))
+            } catch {
+                promise(.failure(error))
+            }
+        }.eraseToAnyPublisher()
     }
 }

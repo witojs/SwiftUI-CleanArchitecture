@@ -4,6 +4,7 @@
 //
 //  Created by Wito Irawan on 24/08/25.
 //
+import Combine
 
 class GetGamesUseCase {
     private let repository: GameRepository
@@ -12,8 +13,9 @@ class GetGamesUseCase {
         self.repository = repository
     }
 
-    func execute(query: String) async throws -> [GameEntity] {
-        return try await repository.getGames(query: query)
-            .sorted { $0.rating > $1.rating } 
+    func execute(query: String) -> AnyPublisher<[GameEntity], Error> {
+        return repository.getGames(query: query)
+            .map { $0.sorted { $0.rating > $1.rating } }
+            .eraseToAnyPublisher()
     }
 }

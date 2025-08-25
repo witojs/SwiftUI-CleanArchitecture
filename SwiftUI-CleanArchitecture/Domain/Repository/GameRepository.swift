@@ -4,13 +4,14 @@
 //
 //  Created by Wito Irawan on 24/08/25.
 //
+import Combine
 
 protocol GameRepository {
-    func getGames(query: String) async throws -> [GameEntity]
-    func getGameDetail(id: Int) async throws -> GameEntity
-    func getScreenshots(for gameId: Int) async throws -> [ScreenshotEntity]
-    func addFavorite(_ game: GameEntity) throws
-    func removeFavorite(id: Int) throws
-    func isFavorite(id: Int) -> Bool
-    func getFavorites() throws -> [GameEntity]
+    func getGames(query: String) -> AnyPublisher<[GameEntity], Error>
+    func getGameDetail(id: Int) -> AnyPublisher<GameEntity, Error>
+    func getScreenshots(for gameId: Int) -> AnyPublisher<[ScreenshotEntity], Error>
+    func addFavorite(_ game: GameEntity) -> AnyPublisher<Void, Error>
+    func removeFavorite(id: Int) -> AnyPublisher<Void, Error>
+    func isFavorite(id: Int) -> AnyPublisher<Bool, Error>
+    func getFavorites() -> AnyPublisher<[GameEntity], Error>
 }

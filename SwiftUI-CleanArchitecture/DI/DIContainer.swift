@@ -11,6 +11,7 @@ import Foundation
 class DIContainer: ObservableObject {
     lazy var apiService: APIServiceProtocol = APIService()
     lazy var localDataSource: LocalDataSourceProtocol = LocalDataSource()
+    lazy var favoriteStatusService: FavoriteStatusServiceProtocol = FavoriteStatusService()
     
     lazy var gameRepository: GameRepository = GameRepositoryImpl(
         remoteDataSource: apiService,
@@ -58,14 +59,16 @@ class DIContainer: ObservableObject {
             getScreenshotsUseCase: makeGetScreenshotsUseCase(), // Inject new dependency
             addFavoriteUseCase: makeAddFavoriteUseCase(),
             removeFavoriteUseCase: makeRemoveFavoriteUseCase(),
-            checkFavoriteStatusUseCase: makeCheckFavoriteStatusUseCase()
+            checkFavoriteStatusUseCase: makeCheckFavoriteStatusUseCase(),
+            favoriteStatusService: favoriteStatusService
         )
     }
     
     func makeFavoriteViewModel() -> FavoriteViewModel {
         FavoriteViewModel(
             getFavoritesUseCase: makeGetFavoritesUseCase(),
-            removeFavoriteUseCase: makeRemoveFavoriteUseCase()
+            removeFavoriteUseCase: makeRemoveFavoriteUseCase(),
+            favoriteStatusService: favoriteStatusService
         )
     }
     

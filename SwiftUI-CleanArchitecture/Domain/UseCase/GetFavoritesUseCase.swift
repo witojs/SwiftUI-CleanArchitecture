@@ -4,6 +4,7 @@
 //
 //  Created by Wito Irawan on 24/08/25.
 //
+import Combine
 
 class GetFavoritesUseCase {
     private let repository: GameRepository
@@ -12,7 +13,9 @@ class GetFavoritesUseCase {
         self.repository = repository
     }
 
-    func execute() throws -> [GameEntity] {
-        return try repository.getFavorites().sorted { $0.name < $1.name }
+    func execute() -> AnyPublisher<[GameEntity], Error> {
+        return repository.getFavorites()
+            .map { $0.sorted { $0.name < $1.name } }
+            .eraseToAnyPublisher()
     }
 }

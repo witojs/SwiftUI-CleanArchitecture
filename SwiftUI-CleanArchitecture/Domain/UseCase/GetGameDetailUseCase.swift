@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class GetGameDetailUseCase {
     private let repository: GameRepository
@@ -14,7 +15,7 @@ class GetGameDetailUseCase {
         self.repository = repository
     }
 
-    func execute(id: Int) async throws -> GameEntity {
-        return try await repository.getGameDetail(id: id)
+    func execute(id: Int) -> AnyPublisher<GameEntity, Error> {
+        return repository.getGameDetail(id: id)
     }
 }

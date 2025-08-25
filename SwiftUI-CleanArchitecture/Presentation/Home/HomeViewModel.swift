@@ -43,13 +43,17 @@ class HomeViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        Task {
-            do {
-                self.games = try await getGamesUseCase.execute(query: query)
-            } catch {
-                self.errorMessage = error.localizedDescription
-            }
-            self.isLoading = false
-        }
+        getGamesUseCase.execute(query: query)
+            // Receive the results on the main thread to safely update the UI
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.isLoading = false
+                if case .failure(let error) = completion {
+                    self?.errorMessage = error.localizedDescription
+                }
+            }, receiveValue: { [weak self] returnedGames in
+                self?.games = returnedGames
+            })
+            .store(in: &cancellables) // Store the subscription
     }
 }
