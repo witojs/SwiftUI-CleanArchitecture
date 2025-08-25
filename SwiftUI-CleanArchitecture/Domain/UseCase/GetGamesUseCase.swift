@@ -14,6 +14,6 @@ class GetGamesUseCase {
 
     func execute(query: String) async throws -> [GameEntity] {
         return try await repository.getGames(query: query)
-            .sorted { $0.rating > $1.rating } // Example of business logic
+            .sorted { $0.rating > $1.rating } 
     }
 }

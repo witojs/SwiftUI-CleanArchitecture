@@ -14,7 +14,7 @@ struct AboutView: View {
                 .font(.system(size: 150))
                 .foregroundColor(.gray)
             
-            Text("Dicoding")
+            Text("Wito Irawan")
                 .font(.largeTitle)
                 .fontWeight(.bold)
             
@@ -22,16 +22,10 @@ struct AboutView: View {
                 .font(.headline)
                 .foregroundColor(.secondary)
             
-            Text("This app was built using SwiftUI with Clean Architecture to demonstrate best practices in modern iOS development.")
+            Text("Submission 1 iOS Expert - Dicoding")
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            
-            // A link to a website.
-            if let url = URL(string: "https://google.com") {
-                Link("Learn More", destination: url)
-                    .font(.headline)
-            }
         }
         .padding()
     }

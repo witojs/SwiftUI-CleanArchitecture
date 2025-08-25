@@ -16,9 +16,7 @@ struct AsyncImageContainer: View {
         AsyncImage(url: URL(string: url)) { image in
             image.resizable()
                 .aspectRatio(contentMode: .fill)
-                // This ensures the image fills the container without affecting its size
                 .frame(width: size.width, height: size.height)
-                // This is the most crucial part: it clips the overflowing image
                 .clipped()
         } placeholder: {
             Color.gray.opacity(0.4)
@@ -38,7 +36,6 @@ struct DetailView: View {
     var body: some View {
         ZStack {
             if let game = viewModel.game {
-                // The background image is now handled by our reusable container
                 AsyncImageContainer(url: game.backgroundImage, size: CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height), cornerRadius: 0)
                     .blur(radius: 20)
                     .opacity(0.3)
@@ -53,7 +50,6 @@ struct DetailView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 } else if let game = viewModel.game {
                     VStack(alignment: .leading, spacing: 24) {
-                        // All image components now use the reusable container
                         HeaderView(game: game)
                         StatsView(game: game)
                             .padding(.horizontal)
@@ -97,7 +93,6 @@ struct DetailView: View {
     }
 }
 
-// ✅ UPDATED HEADER VIEW ✅
 struct HeaderView: View {
     let game: GameEntity
     var body: some View {
@@ -115,9 +110,6 @@ struct HeaderView: View {
     }
 }
 
-// The rest of the subviews from the previous response remain the same.
-// Make sure they are included in this file.
-
 struct StatsView: View {
     let game: GameEntity
     var body: some View {
@@ -129,7 +121,7 @@ struct StatsView: View {
             Spacer()
         }
         .padding(.vertical)
-        .background(Color.black.opacity(0.25))
+        .background(Color.black.opacity(0.35))
         .clipShape(RoundedRectangle(cornerRadius: 15))
     }
 }
@@ -144,7 +136,7 @@ struct StatPill: View {
                 .font(.title).fontWeight(.bold)
                 .foregroundColor(color)
             Text(title)
-                .font(.caption)
+                .font(.caption).fontWeight(.semibold)
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal)

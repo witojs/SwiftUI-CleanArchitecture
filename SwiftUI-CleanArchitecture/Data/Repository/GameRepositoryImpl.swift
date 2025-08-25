@@ -17,14 +17,13 @@ class GameRepositoryImpl: GameRepository {
     // --- Remote ---
     func getGames(query: String) async throws -> [GameEntity] {
         let games = try await remoteDataSource.fetchGames(with: query)
-        // Map from Data model to Domain entity
+        
         return games.map { $0.toEntity() }
     }
     
     func getGameDetail(id: Int) async throws -> GameEntity {
-        // 1. Call the remote data source's detail endpoint.
         let gameDetail = try await remoteDataSource.fetchGameDetail(id: id)
-        // 2. Map the detailed `Game` DTO to a clean `GameEntity`.
+
         return gameDetail.toEntity()
     }
     
@@ -47,11 +46,8 @@ class GameRepositoryImpl: GameRepository {
     }
     
     func getFavorites() throws -> [GameEntity] {
-        // 1. Call the local data source to fetch the raw `FavoriteGame` objects.
         let favoriteGames = try localDataSource.getFavorites()
         
-        // 2. Map the array of `FavoriteGame` models to an array of `GameEntity` models.
-        // This ensures the data returned is in the clean, domain-centric format.
         return favoriteGames.map { $0.toEntity() }
     }
 }
@@ -83,7 +79,6 @@ extension GameEntity {
             backgroundImage: self.backgroundImage,
             rating: self.rating,
             gameDescription: self.description,
-            // Pass the new data to be saved
             metacritic: self.metacritic,
             genres: self.genres,
             platforms: self.platforms,
@@ -106,8 +101,7 @@ extension FavoriteGame {
             released: self.released,
             backgroundImage: self.backgroundImage,
             rating: self.rating,
-            description: self.gameDescription, // Use the saved description
-            // Load the new data from the database object
+            description: self.gameDescription,
             metacritic: self.metacritic,
             genres: self.genres,
             platforms: self.platforms,

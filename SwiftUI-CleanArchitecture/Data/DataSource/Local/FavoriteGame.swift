@@ -17,7 +17,6 @@ final class FavoriteGame {
     var rating: Double
     var gameDescription: String
     
-    // --- NEW PROPERTIES TO SAVE ---
     var metacritic: Int
     var genres: [String]
     var platforms: [String]

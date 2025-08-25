@@ -8,19 +8,16 @@
 import Foundation
 
 @MainActor
-class DIContainer {
-    // Singletons for data sources
+class DIContainer: ObservableObject {
     lazy var apiService: APIServiceProtocol = APIService()
     lazy var localDataSource: LocalDataSourceProtocol = LocalDataSource()
     
-    // The repository is also a good candidate for a singleton instance
     lazy var gameRepository: GameRepository = GameRepositoryImpl(
         remoteDataSource: apiService,
         localDataSource: localDataSource
     )
     
     // --- Use Cases ---
-    // Use cases are lightweight and can be created on demand
     func makeGetGamesUseCase() -> GetGamesUseCase {
         GetGamesUseCase(repository: gameRepository)
     }
@@ -73,7 +70,6 @@ class DIContainer {
     }
     
     // --- Views (Factory method) ---
-    // To make navigation easier, we can have the container build the DetailView too
     func makeDetailView(for gameId: Int) -> DetailView {
         let viewModel = makeDetailViewModel(for: gameId)
         return DetailView(viewModel: viewModel)

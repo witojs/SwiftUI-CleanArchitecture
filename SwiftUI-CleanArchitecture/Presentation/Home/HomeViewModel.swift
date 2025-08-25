@@ -22,7 +22,6 @@ class HomeViewModel: ObservableObject {
         games.filter { $0.rating >= 4.5 }
     }
     
-    // This computed property returns all other games.
     var allGames: [GameEntity] {
         games.filter { $0.rating < 4.5 }
     }
@@ -32,7 +31,7 @@ class HomeViewModel: ObservableObject {
         
         // Use Combine to react to search text changes
         $searchText
-            .debounce(for: .milliseconds(800), scheduler: RunLoop.main) // Wait for user to stop typing
+            .debounce(for: .milliseconds(800), scheduler: RunLoop.main) 
             .removeDuplicates()
             .sink { [weak self] query in
                 self?.fetchGames(query: query)
